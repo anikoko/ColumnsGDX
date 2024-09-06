@@ -22,10 +22,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import columns.Controller;
 import columns.Figure;
 import columns.Model;
+import columns.StageListener;
 import columns.View;
 import columns.Graphics;
 
-public class ColumnsStage extends Stage implements Graphics {
+public class ColumnsStage extends Stage implements Graphics, StageListener {
 	
 	static Color[] COLORS = new Color[] {Color.BLACK,Color.CYAN,Color.BLUE,Color.RED,Color.GREEN,
 		    Color.YELLOW,Color.PINK,Color.MAGENTA,Color.WHITE};
@@ -35,8 +36,12 @@ public class ColumnsStage extends Stage implements Graphics {
 	private Model model;
 	private Controller controller;
 	private TextRenderer textRenderer;
+	private Timer.Task task;
+	private float speed = 1.0f;
+	public boolean paused = false;
 	
 	final List<ScreenListener> screenListeners = new ArrayList<>();
+
 
 
 	public ColumnsStage() {
@@ -62,21 +67,26 @@ public class ColumnsStage extends Stage implements Graphics {
 		controller.initController();
 
 		model.addListener(controller);
+		model.addStageListener(this);
 		
-
-		Timer.schedule(new Timer.Task() {
-			@Override
-			public void run() {
-				controller.trySlideDown();
-			}
-		}, 1.0f, 1.0f);
+		scheduleTask();
 
 		Gdx.input.setInputProcessor(this);
 
 		addListener(new InputListener() {
+			
 
 			@Override
 			public boolean keyDown(InputEvent event, int keycode) {
+				if (keycode == Input.Keys.P) {
+					pauseGame();
+					return true;
+				}
+					
+				if (paused) {
+					return true;
+				}
+				
 				switch (keycode) {
 				case Input.Keys.LEFT:
 					controller.tryMoveLeft();
@@ -113,12 +123,31 @@ public class ColumnsStage extends Stage implements Graphics {
 				return true;
 			}
 
-		});
 
+		});
+	}
+	
+	private void pauseGame() {
+		paused = !paused;
+		if (paused) {
+			if (task != null && task.isScheduled()) {
+			textRenderer.setPauseText("Game Paused");
+			task.cancel();
+			}
+		} else {
+			if (task != null && !task.isScheduled()) {
+			textRenderer.dispose();
+			rescheduleTask();
+			}
+		}
 	}
 	
 	@Override
 	public void draw() {
+		if (paused) {
+			textRenderer.renderPauseMessage();
+			return;
+		}
 		textRenderer.render();
 		view.drawModel(model);
 		if (controller.gameOver()) {
@@ -189,6 +218,32 @@ public class ColumnsStage extends Stage implements Graphics {
 	@Override
 	public void showScore(int score) {
 		textRenderer.setScore("Score: " + score);	
+	}
+	
+// <--------------- Stage Listener --------->
+	@Override
+	public void levelHasChanged(int level) {
+		speed = (float) Math.pow(0.9f, level);
+		rescheduleTask();
+	}
+	
+	public void scheduleTask() {
+		task = new Timer.Task() {
+
+			@Override
+			public void run() {
+				controller.trySlideDown();
+				
+			}
+		};
+		Timer.schedule(task, 1.0f, speed);
+	}
+	
+	public void rescheduleTask() {
+		if (task != null && task.isScheduled()) {
+	        task.cancel();
+	    }
+	    scheduleTask();
 	}
 	
 	

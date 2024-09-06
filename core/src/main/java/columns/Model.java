@@ -19,7 +19,10 @@ public class Model {
 	public boolean noChanges = true;
 	public boolean gameOver = false;
 	
-	List<ModelListener> listeners = new ArrayList<>();
+	final List<StageListener> stageListeners = new ArrayList<>();
+
+	
+	final List<ModelListener> listeners = new ArrayList<>();
 
 	void dropFigure(Figure f) {
 		int zz;
@@ -177,6 +180,9 @@ public class Model {
 		for (ModelListener modelListener : listeners) {
 			modelListener.levelHasChanged(level);
 		}
+		for (StageListener stageListener : stageListeners) {
+			stageListener.levelHasChanged(level);
+		}
 
 	}
 
@@ -265,6 +271,10 @@ public class Model {
 		pasteFigure(Fig);
 		removeSimilarCellsRepeatedly();
 		checkIfFieldIsFull();
+	}
+	
+	public void addStageListener(StageListener listener) {
+		stageListeners.add(listener);
 	}
 
 

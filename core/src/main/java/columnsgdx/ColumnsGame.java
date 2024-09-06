@@ -1,6 +1,8 @@
 package columnsgdx;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class ColumnsGame extends Game implements ScreenListener {
@@ -30,6 +32,6 @@ public class ColumnsGame extends Game implements ScreenListener {
 	    columnsScreen._stage.addScreenListener(this);
 		
 	}
-
+	
 
 }

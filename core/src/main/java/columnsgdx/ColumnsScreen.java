@@ -14,7 +14,9 @@ public class ColumnsScreen extends ScreenAdapter {
 
 	@Override
 	public void render(float delta) {
-		_stage.act(delta);
+		if (!_stage.paused) {
+			_stage.act(delta);
+		}
 		_stage.draw();
 
 	}
@@ -22,6 +24,11 @@ public class ColumnsScreen extends ScreenAdapter {
 	@Override
 	public void resize(int width, int height) {
 		_stage.getViewport().update(width, height, true);
+	}
+	
+	@Override
+	public void pause() {
+		super.pause();
 	}
 
 

@@ -13,7 +13,11 @@ public class TextRenderer extends ApplicationAdapter  {
     private BitmapFont font;
     private String score;
     private String level;
+    private String pauseText;
    
+    public SpriteBatch batchForPause;
+    public BitmapFont fontForPause;
+    
     public void setScore(String score) {
 		this.score = score;
 	}
@@ -22,13 +26,28 @@ public class TextRenderer extends ApplicationAdapter  {
     	this.level = level;
     }
 
+    public void setPauseText(String pausedText) {
+    	this.pauseText = pausedText;
+    }
+    
+    public void renderPauseMessage() {
+    	batchForPause = new SpriteBatch();
+    	fontForPause = new BitmapFont();
+    	fontForPause.setColor(Color.RED);
+    	fontForPause.getData().setScale(2f);    	
+    	if (pauseText != null) {
+    		batchForPause.begin();
+    		fontForPause.draw(batchForPause, pauseText, 190, 300);
+    		batchForPause.end();
+    	}
+    }
+    
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
 		font = new BitmapFont();
 		font.setColor(Color.RED);
-		font.getData().setScale(1.5f);
-		
+		font.getData().setScale(1.5f);	
 	}
 
 
@@ -50,9 +69,9 @@ public class TextRenderer extends ApplicationAdapter  {
 
 	@Override
 	public void dispose() {
-		batch.dispose();
-		font.dispose();
-		
+		pauseText = null;
+		batchForPause.dispose();
+		fontForPause.dispose();
 	}
 
 }
